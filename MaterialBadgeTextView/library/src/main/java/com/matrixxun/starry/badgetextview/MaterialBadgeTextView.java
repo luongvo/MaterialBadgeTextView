@@ -34,6 +34,7 @@ public class MaterialBadgeTextView extends TextView {
     private float borderWidth;
     private float borderAlpha;
     private int ctType;
+    private boolean enableShadow;
 
     private static final float SHADOW_RADIUS = 3.5f;
     private static final int FILL_SHADOW_COLOR = 0x55000000;
@@ -41,7 +42,6 @@ public class MaterialBadgeTextView extends TextView {
 
     private static final float X_OFFSET = 0f;
     private static final float Y_OFFSET = 1.75f;
-
 
     private float density;
     private int mShadowRadius;
@@ -84,6 +84,7 @@ public class MaterialBadgeTextView extends TextView {
         borderWidth = typedArray.getDimension(R.styleable.MaterialBadgeTextView_mbtv_border_width, 0);
         borderAlpha = typedArray.getFloat(R.styleable.MaterialBadgeTextView_mbtv_border_alpha, 1);
         ctType = typedArray.getInt(R.styleable.MaterialBadgeTextView_mbtv_type, DEFAULT_FILL_TYPE);
+        enableShadow = typedArray.getBoolean(R.styleable.MaterialBadgeTextView_mbtv_shadow, true);
         typedArray.recycle();
     }
 
@@ -91,8 +92,8 @@ public class MaterialBadgeTextView extends TextView {
     protected void onTextChanged(CharSequence text, int start, int lengthBefore, int lengthAfter) {
         super.onTextChanged(text, start, lengthBefore, lengthAfter);
         /** 纯色小红点模式下若有文本需要从无变为有, 要归位view的大小.*/
-        String strText = text==null?"":text.toString().trim();
-        if(isHighLightMode && !"".equals(strText)){
+        String strText = text == null ? "" : text.toString().trim();
+        if (isHighLightMode && !"".equals(strText)) {
             ViewGroup.LayoutParams lp = getLayoutParams();
             lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
             lp.width = ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -122,8 +123,10 @@ public class MaterialBadgeTextView extends TextView {
             OvalShape oval = new OvalShadow(mShadowRadius, diameter);
             circle = new ShapeDrawable(oval);
             ViewCompat.setLayerType(this, ViewCompat.LAYER_TYPE_SOFTWARE, circle.getPaint());
-            circle.getPaint().setShadowLayer(mShadowRadius, shadowXOffset, shadowYOffset, KEY_SHADOW_COLOR);
             circle.getPaint().setColor(backgroundColor);
+            if (enableShadow) {
+                circle.getPaint().setShadowLayer(mShadowRadius, shadowXOffset, shadowYOffset, KEY_SHADOW_COLOR);
+            }
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
                 setBackgroundDrawable(circle);
             } else {
@@ -132,8 +135,10 @@ public class MaterialBadgeTextView extends TextView {
         } else if (text.length() > 1) {/**第二种背景是上下两边为直线的椭圆, 当文本长度大于1时 */
             SemiCircleRectDrawable sr = new SemiCircleRectDrawable();
             ViewCompat.setLayerType(this, ViewCompat.LAYER_TYPE_SOFTWARE, sr.getPaint());
-            sr.getPaint().setShadowLayer(mShadowRadius, shadowXOffset, shadowYOffset, KEY_SHADOW_COLOR);
             sr.getPaint().setColor(backgroundColor);
+            if (enableShadow) {
+                sr.getPaint().setShadowLayer(mShadowRadius, shadowXOffset, shadowYOffset, KEY_SHADOW_COLOR);
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 setBackground(sr);
             } else {
@@ -147,9 +152,10 @@ public class MaterialBadgeTextView extends TextView {
 
     }
 
-    public void setBadgeCount(String count){
+    public void setBadgeCount(String count) {
         setBadgeCount(count, false);
     }
+
     public void setBadgeCount(String count, boolean goneWhenZero) {
         int temp = -1;
         try {
@@ -162,21 +168,22 @@ public class MaterialBadgeTextView extends TextView {
         }
     }
 
-    public void setBadgeCount(int count){
+    public void setBadgeCount(int count) {
         setBadgeCount(count, true);
     }
-    public void setBadgeCount(int count, boolean goneWhenZero){
-        if(count >0 && count <= 99){
+
+    public void setBadgeCount(int count, boolean goneWhenZero) {
+        if (count > 0 && count <= 99) {
             setText(String.valueOf(count));
             setVisibility(View.VISIBLE);
-        }else if(count >99){
+        } else if (count > 99) {
             setText("99+");
             setVisibility(View.VISIBLE);
-        }else if(count <= 0){
+        } else if (count <= 0) {
             setText("0");
-            if(goneWhenZero){
+            if (goneWhenZero) {
                 setVisibility(View.GONE);
-            }else{
+            } else {
                 setVisibility(View.VISIBLE);
             }
         }
@@ -186,33 +193,35 @@ public class MaterialBadgeTextView extends TextView {
      * 明确的展现一个无任何文本的红色圆点,
      * 主要是通过设置文本setText("")触发onTextChanged(), 再连锁触发onSizeChanged()最后更新了背景.
      */
-    public void setHighLightMode(){
+    public void setHighLightMode() {
         setHighLightMode(false);
     }
 
-    public void clearHighLightMode(){
+    public void clearHighLightMode() {
         isHighLightMode = false;
         setBadgeCount(0);
     }
 
     /**
-     *
      * @param isDisplayInToolbarMenu
      */
-    public void setHighLightMode(boolean isDisplayInToolbarMenu){
+    public void setHighLightMode(boolean isDisplayInToolbarMenu) {
         isHighLightMode = true;
         ViewGroup.LayoutParams params = getLayoutParams();
         params.width = dp2px(getContext(), 8);
         params.height = params.width;
-        if(isDisplayInToolbarMenu && params instanceof FrameLayout.LayoutParams){
-            ((FrameLayout.LayoutParams)params).topMargin=dp2px(getContext(), 8);
-            ((FrameLayout.LayoutParams)params).rightMargin=dp2px(getContext(), 8);
+        if (isDisplayInToolbarMenu && params instanceof FrameLayout.LayoutParams) {
+            ((FrameLayout.LayoutParams) params).topMargin = dp2px(getContext(), 8);
+            ((FrameLayout.LayoutParams) params).rightMargin = dp2px(getContext(), 8);
         }
         setLayoutParams(params);
         ShapeDrawable drawable = new ShapeDrawable(new OvalShape());
         ViewCompat.setLayerType(this, ViewCompat.LAYER_TYPE_SOFTWARE, drawable.getPaint());
         drawable.getPaint().setColor(backgroundColor);
         drawable.getPaint().setAntiAlias(true);
+        if (enableShadow) {
+            drawable.getPaint().setShadowLayer(mShadowRadius, shadowXOffset, shadowYOffset, KEY_SHADOW_COLOR);
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             setBackground(drawable);
         } else {
@@ -222,7 +231,7 @@ public class MaterialBadgeTextView extends TextView {
         setVisibility(View.VISIBLE);
     }
 
-    public void setBackgroundColor(int color){
+    public void setBackgroundColor(int color) {
         backgroundColor = color;
         refreshBackgroundDrawable(getWidth(), getHeight());
     }
@@ -270,17 +279,17 @@ public class MaterialBadgeTextView extends TextView {
         public void setBounds(int left, int top, int right, int bottom) {
             super.setBounds(left, top, right, bottom);
             if (rectF == null) {
-                rectF = new RectF(left + diffWH, top + mShadowRadius+4, right - diffWH, bottom - mShadowRadius-4);
+                rectF = new RectF(left + diffWH, top + mShadowRadius + 4, right - diffWH, bottom - mShadowRadius - 4);
             } else {
-                rectF.set(left + diffWH, top + mShadowRadius+4, right - diffWH, bottom - mShadowRadius-4);
+                rectF.set(left + diffWH, top + mShadowRadius + 4, right - diffWH, bottom - mShadowRadius - 4);
             }
         }
 
         @Override
         public void draw(Canvas canvas) {
-            float R = (float)(rectF.bottom * 0.4);
+            float R = (float) (rectF.bottom * 0.4);
             if (rectF.right < rectF.bottom) {
-                R = (float)(rectF.right * 0.4);
+                R = (float) (rectF.right * 0.4);
             }
             canvas.drawRoundRect(rectF, R, R, mPaint);
         }
