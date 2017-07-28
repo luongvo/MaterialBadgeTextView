@@ -27,13 +27,7 @@ import android.widget.TextView;
  */
 public class MaterialBadgeTextView extends TextView {
 
-    private static final int DEFAULT_FILL_TYPE = 0;
-
     private int backgroundColor;
-    private int borderColor;
-    private float borderWidth;
-    private float borderAlpha;
-    private int ctType;
     private boolean enableShadow;
 
     private static final float SHADOW_RADIUS = 3.5f;
@@ -80,10 +74,6 @@ public class MaterialBadgeTextView extends TextView {
         setPadding(horizontalPadding, basePadding, horizontalPadding, basePadding);
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MaterialBadgeTextView);
         backgroundColor = typedArray.getColor(R.styleable.MaterialBadgeTextView_android_background, Color.WHITE);
-        borderColor = typedArray.getColor(R.styleable.MaterialBadgeTextView_mbtv_border_color, Color.TRANSPARENT);
-        borderWidth = typedArray.getDimension(R.styleable.MaterialBadgeTextView_mbtv_border_width, 0);
-        borderAlpha = typedArray.getFloat(R.styleable.MaterialBadgeTextView_mbtv_border_alpha, 1);
-        ctType = typedArray.getInt(R.styleable.MaterialBadgeTextView_mbtv_type, DEFAULT_FILL_TYPE);
         enableShadow = typedArray.getBoolean(R.styleable.MaterialBadgeTextView_mbtv_shadow, true);
         typedArray.recycle();
     }
