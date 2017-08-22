@@ -66,12 +66,17 @@ public class MaterialBadgeTextView extends TextView {
         mShadowRadius = (int) (density * SHADOW_RADIUS);
         shadowYOffset = (int) (density * Y_OFFSET);
         shadowXOffset = (int) (density * X_OFFSET);
-        basePadding = (mShadowRadius * 2);
+
+        basePadding = mShadowRadius;
         float textHeight = getTextSize();
         float textWidth = textHeight / 4;
         diffWH = (int) (Math.abs(textHeight - textWidth) / 2);
         int horizontalPadding = basePadding + diffWH;
-        setPadding(horizontalPadding, basePadding, horizontalPadding, basePadding);
+        setPadding(horizontalPadding + getPaddingLeft(),
+                basePadding + getPaddingTop(),
+                horizontalPadding + getPaddingRight(),
+                basePadding + getPaddingBottom());
+
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MaterialBadgeTextView);
         backgroundColor = typedArray.getColor(R.styleable.MaterialBadgeTextView_android_background, Color.WHITE);
         enableShadow = typedArray.getBoolean(R.styleable.MaterialBadgeTextView_mbtv_shadow, true);
